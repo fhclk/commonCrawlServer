@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/crawlSetting.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">网络爬虫</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/crawlSetting/createTask.html">创建任务 <span class="sr-only">(current)</span></a></li>
+                    <li><a href="/crawlSetting/dashboard.html">控制面板</a></li>
+                    <li><a href="/crawlSetting/manageTask.html">任务管理</a></li>
+                    <li><a href="/crawlSetting/history.html">历史记录</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    <div ng-app="crawlSetting" ng-controller="createTask">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">任务编号</label>
+                <div class="col-sm-9">
+                    <!-- <input type="text" class="form-control" placeholder="任务编号" ng-model="taskConfig.task_no" readonly> -->
+                    <input type="text" class="form-control" placeholder="任务编号" ng-model="taskConfig.task_no">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">起始网站URL</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" placeholder="起始网站URL" ng-model="taskConfig.start_url">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">是否长传图片</label>
+                <div class="col-sm-9">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="is_upload_image"> 是否上传爬取到的网页中的图片
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">爬虫类型</label>
+                <div class="col-sm-9">
+                    <label class="radio-inline">
+                        <input type="radio" id="inlineRadio1" value="normal_spider" ng-model="taskConfig.task_type"> 常规
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" id="inlineRadio2" value="rule_spider" ng-model="taskConfig.task_type"> 基于规则
+                    </label>
+                </div>
+            </div>
+            <div class="upload-img" ng-if="is_upload_image">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">上传图片接口</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" placeholder="http://xxxx.xxx.com/uploadImage" ng-model="taskConfig.upload_image.request_url">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">接口参数</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" placeholder="{'name':'xxxx','size':1024}" ng-model="taskConfig.upload_image.params">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">是否替换图片src</label>
+                    <div class="col-sm-9">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="is_replace_img_src"> 是否把爬取到的网页中的图片的src替换成服务器上的地址
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="replace-img-src" ng-if="is_replace_img_src">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">图片相对路径</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" placeholder="服务器上存放图片的相对路径" ng-model="taskConfig.replace_img_src.base_server_path">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="normal-spider" ng-if="taskConfig.task_type == 'normal_spider'">
+                <label class="col-sm-2 control-label">流程</label>
+                <div class="col-sm-9" style="background-color: #f9f9f9">
+                    <div style="margin-bottom: 10px;" ng-if="taskConfig.follows.length > 0">
+                        <div ng-repeat="follow in taskConfig.follows">
+                            <div class="panel panel-default" ng-if="follow.type==='orderly_list'">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span>有序列表</span><span class="flow-ord">ord: {{follow.ord}}</span>
+                                        <panel-tools-directive follow=follow follows=taskConfig.follows></panel-tools-directive>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">列表item1的xpath</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="//div[@class='maincontentmoji']/div[@class='pagelist']/ul/li[1]" ng-model="follow.selector1">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">列表item2的xpath</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="//div[@class='maincontentmoji']/div[@class='pagelist']/ul/li[2]" ng-model="follow.selector2">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">item链接的xpath</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="//div[@class='maincontentmoji']/div[@class='pagelist']/ul/li[2]/a" ng-model="follow.link_selector">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">是否有下一页</label>
+                                        <div class="col-sm-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" ng-model="follow.has_next_page"> 是否有下一页
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="follow.has_next_page">
+                                        <label class="col-sm-2 control-label">下一页流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="2" ng-model='follow.next_page_ord'>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">爬取字段</label>
+                                        <div class="col-sm-9" style="background-color: #f9f9f9">
+                                            <columns-directive columns=follow.columns></columns-directive>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">下一个流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="2" ng-model="follow.next_follow_ord">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default disordered-list" ng-if="follow.type==='disordered_list'">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span>无序列表</span><span class="flow-ord">ord: {{follow.ord}}</span>
+                                        <panel-tools-directive follow=follow follows=taskConfig.follows></panel-tools-directive>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">无序列表</label>
+                                        <div class="col-sm-10" style="background-color: #f9f9f9">
+                                            <div style="margin-bottom: 10px" ng-if="follow.list.length > 0">
+                                                <div class="column-item" ng-repeat="item in follow.list">
+                                                    <item-delete-tool item=item items=follow.list></item-delete-tool>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">item链接xpath</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" placeholder="如: //div[@class='maincontentmoji']/div[@class='pagelist']/ul/li[2]/a" ng-model="item.link_selector">
+                                                        </div>
+                                                    </div>
+                                                    <div class="division"></div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">下一个流程的ord</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="number" class="form-control" placeholder="如: 3" ng-model="item.next_follow_ord">
+                                                        </div>
+                                                    </div>
+                                                    <div class="division"></div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">爬取字段</label>
+                                                        <div class="col-sm-9" style="background-color: #f9f9f9">
+                                                            <columns-directive columns=item.columns></columns-directive>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-default" ng-click="addDisorderedListItem(follow)">添加列表item</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">是否有下一页</label>
+                                        <div class="col-sm-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" ng-model="follow.has_next_page"> 是否有下一页
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="follow.has_next_page">
+                                        <label class="col-sm-2 control-label">下一页流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="2" ng-model='follow.next_page_ord'>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">下一个流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="0" ng-model="follow.next_follow_ord">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default" ng-if="follow.type==='next_page'">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span>下一页</span><span class="flow-ord">ord: {{follow.ord}}</span>
+                                        <panel-tools-directive follow=follow follows=taskConfig.follows></panel-tools-directive>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">下一页链接的xpath</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="//div[@class='maincontentmoji']/div[@class='pagelist']/ul/li[2]/a" ng-model="follow.link_selector">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">爬取页数</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="所要爬取的页数，0将爬取所有页数" ng-model="follow.max_pages">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">下一个流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" placeholder="3" ng-model="follow.next_follow_ord">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default" ng-if="follow.type==='single_page'">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span>单页</span><span class="flow-ord">ord: {{follow.ord}}</span>
+                                        <panel-tools-directive follow=follow follows=taskConfig.follows></panel-tools-directive>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">爬取字段</label>
+                                        <div class="col-sm-9" style="background-color: #f9f9f9">
+                                            <columns-directive columns=follow.columns></columns-directive>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">是否有下一页</label>
+                                        <div class="col-sm-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" ng-model="follow.has_next_page"> 是否有下一页
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="follow.has_next_page">
+                                        <label class="col-sm-2 control-label">下一页流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="2" ng-model='follow.next_page_ord'>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">下一个流程的ord</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" placeholder="4" ng-model="follow.next_follow_ord">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            添加流程步骤 <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a ng-click="addOrderlyListFollow()">有序列表</a></li>
+                            <li><a ng-click="addDisorderedListFollow()">无序列表</a></li>
+                            <li><a ng-click="addNextPageFollow()">下一页</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a ng-click="addSinglePageFollow()">单页</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="rule-spider" ng-if="taskConfig.task_type == 'rule_spider'">
+                <label class="col-sm-2 control-label">规则</label>
+                <div class="col-sm-9" style="background-color: #f9f9f9">
+                    <div style="margin-bottom: 10px;" ng-if="taskConfig.url_rules.length > 0">
+                        <div ng-repeat="rule in taskConfig.url_rules">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <span>规则</span><span class="flow-ord">ord: {{rule.ord}}</span>
+                                        <panel-tools-directive follow=rule follows=taskConfig.url_rules></panel-tools-directive>
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">允许</label>
+                                        <div class="col-sm-9">
+                                            <!-- <input type="text" class="form-control" placeholder="允许爬取的url的正则表达式" ng-model="rule.allow"> -->
+                                            <textarea class="form-control" placeholder='允许爬取的url的正则表达式, 用\";换行\"来区别多个正则表达式'  ng-model="rule.allow"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">不允许</label>
+                                        <div class="col-sm-9">
+                                            <textarea type="text" class="form-control" placeholder='不允许爬取的url的正则表达式, 用\";换行\"来区别多个正则表达式' ng-model="rule.deny"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">是否爬取内容</label>
+                                        <div class="col-sm-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" ng-model="rule.need_parse"> 是否需要爬取字段内容
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-if="rule.need_parse">
+                                        <label class="col-sm-2 control-label">爬取字段</label>
+                                        <div class="col-sm-9" style="background-color: #f9f9f9">
+                                            <columns-directive columns=rule.columns></columns-directive>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-default" ng-click="addRules()">添加规则</button>
+                </div>
+            </div>
+            <div style="height: 20px"></div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-9">
+                    <div>
+                        <div class="alert alert-success" role="alert" ng-if="toDoResult && toDoMessage">{{toDoMessage}}</div>
+                        <div class="alert alert-danger alert-dismissible" role="alert" ng-if="!toDoResult && toDoMessage">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            {{toDoMessage}}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default" data-toggle="modal" data-target="#viewConfig">查看</button>
+                    <button type="submit" class="btn btn-default" ng-click="cleanFillData()">清除</button>
+                    <div style="display: inline;" ng-if="taskConfig.follows.length > 0 && taskConfig.start_url">
+                        <button type="submit" class="btn btn-default" ng-click="saveTaskConfig()">保存</button>
+                        <button type="submit" class="btn btn-default" ng-click="createTask()">创建任务</button>
+                    </div>
+                    <div style="display: inline;" ng-if="taskConfig.follows.length == 0 || !taskConfig.start_url">
+                        <button type="submit" class="btn btn-default" disabled>保存</button>
+                        <button type="submit" class="btn btn-default" disabled>创建任务</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="modal fade bs-example-modal-lg" id="viewConfig" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">爬虫任务配置参数</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- <div id="show-config"> -->
+                        <pre><code>{{showJson(taskConfig)}}</code></pre>
+                        <!-- </div> -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/xdate.js"></script>
+    <script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <script type="text/javascript" src="../static/crawlSetting/js/app.js"></script>
+    <script type="text/javascript" src="../static/crawlSetting/js/directive.js"></script>
+    <script type="text/javascript" src="../static/crawlSetting/js/createTask.js"></script>
+</body>
+
+</html>

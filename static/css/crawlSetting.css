@@ -1,0 +1,49 @@
+.flow-ord {
+	margin-left: 20px;
+	font-size: 14px;
+	color: #666;
+}
+
+.column-item {
+	margin: 5px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: white;
+	position: relative;
+}
+
+.column-item .form-group {
+	margin-bottom: 0px;
+}
+
+.column-item .division {
+	height: 10px;
+}
+
+.disordered-list .column-item label {
+	font-size: 12px;
+}
+
+.panel-tools {
+	display: inline;
+	float: right;
+}
+
+.panel-tools img {
+	width: 22px;
+	height: 22px;
+	margin-left: 7px;
+}
+
+.item-delete-tool {
+	position: absolute; 
+	top: -5px; 
+	left: -5px;
+	width: 18px;
+	height: 18px;
+}
+
+.table button {
+	height: 18px;
+}

@@ -1,0 +1,64 @@
+<div>
+<div>abcd</div>
+<div style="margin-bottom: 10px">
+    <div class="column-item" ng-repeat="column in columns">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">字段name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" placeholder="date" ng-model="column.name">
+            </div>
+        </div>
+        <div class="division"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">字段xpath</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" placeholder="//div[@class='pagelist']/ul/li[2]/span[@class='time']" ng-model="column.selector">
+            </div>
+        </div>
+        <div class="division"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">过滤条件</label>
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="column.has_condition"> 是否根据此字段来判断是否是需要爬取的内容
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div ng-if="column.has_condition">
+            <div class="division"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">判断类型</label>
+                <div class="col-sm-9">
+                    <select ng-model="column.condition.type" ng-init="column.condition.type='date'">
+                        <option value="date">日期
+                            <option value="number">数值
+                                <option value="string">字符串
+                    </select>
+                </div>
+            </div>
+            <div class="division"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">format</label>
+                <div class="col-sm-9" ng-switch="column.condition.type">
+                    <input type="text" class="form-control" placeholder="如: ( yyyy-MM-dd )" ng-switch-when="date" ng-model="column.condition.format">
+                    <input type="text" class="form-control" placeholder="如: >=" ng-switch-when="number" ng-model="column.condition.format">
+                    <input type="text" class="form-control" placeholder="如: 正则表达式" ng-switch-when="string" ng-model="column.condition.format">
+                </div>
+            </div>
+            <div ng-if="column.condition.type!='string'">
+                <div class="division"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">value</label>
+                    <div class="col-sm-9" ng-switch="column.condition.type">
+                        <input type="text" class="form-control" placeholder="如: 2013-04-07 00:00:00" ng-switch-when="date" ng-model="column.condition.value">
+                        <input type="text" class="form-control" placeholder="如: 200" ng-switch-when="number" ng-model="column.condition.value">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button type="button" class="btn btn-default" ng-click="addColumn(columns)">添加字段</button>
+</div>
